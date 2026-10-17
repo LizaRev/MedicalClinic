@@ -1,0 +1,69 @@
+
+namespace MedicalClinic.Core.Models;
+
+public class Patient : Entity
+{
+    private string _fullName = "";
+    private string _phoneNumber = "";
+    private DateTime _dateOfBirth;
+
+    public string FullName
+    {
+        get { return _fullName; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(
+                    "Ім'я пацієнта не може бути порожнім."
+                );
+            }
+
+            _fullName = value;
+        }
+    }
+
+    public string PhoneNumber
+    {
+        get { return _phoneNumber; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(
+                    "Номер телефону не може бути порожнім."
+                );
+            }
+
+            _phoneNumber = value;
+        }
+    }
+
+    public DateTime DateOfBirth
+    {
+        get { return _dateOfBirth; }
+        set
+        {
+            if (value.Date >= DateTime.Today)
+            {
+                throw new ArgumentException(
+                    "Дата народження має бути в минулому."
+                );
+            }
+
+            _dateOfBirth = value;
+        }
+    }
+
+    public Patient(
+        int id,
+        string fullName,
+        string phoneNumber,
+        DateTime dateOfBirth
+    ) : base(id)
+    {
+        FullName = fullName;
+        PhoneNumber = phoneNumber;
+        DateOfBirth = dateOfBirth;
+    }
+}

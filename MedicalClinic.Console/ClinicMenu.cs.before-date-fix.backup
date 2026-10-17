@@ -1,0 +1,577 @@
+
+using System.Globalization;
+using MedicalClinic.Core.Exceptions;
+using MedicalClinic.Core.Models;
+using MedicalClinic.Core.Services;
+
+namespace MedicalClinic.ConsoleApp;
+
+public class ClinicMenu
+{
+    private readonly ClinicService _clinicService;
+
+    public ClinicMenu(ClinicService clinicService)
+    {
+        _clinicService = clinicService;
+    }
+
+    public void Run()
+    {
+        bool isRunning = true;
+
+        while (isRunning)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Медична клініка");
+            Console.WriteLine("1. Додати лікаря");
+            Console.WriteLine("2. Переглянути лікарів");
+            Console.WriteLine("3. Додати пацієнта");
+            Console.WriteLine("4. Переглянути пацієнтів");
+            Console.WriteLine("5. Записати пацієнта до лікаря");
+            Console.WriteLine("6. Переглянути прийоми");
+            Console.WriteLine("7. Завершити прийом");
+            Console.WriteLine("8. Додати медичний запис");
+            Console.WriteLine("9. Історія хвороб пацієнта");
+            Console.WriteLine("10. Вартість послуг пацієнта");
+            Console.WriteLine("11. Сортувати лікарів за ціною");
+            Console.WriteLine("0. Вийти");
+            Console.Write("Ваш вибір: ");
+
+            string choice = Console.ReadLine() ?? "";
+
+            try
+            {
+                switch (choice)
+                {
+                    case "1":
+                        AddDoctor();
+                        break;
+                    case "2":
+                        ShowDoctors();
+                        break;
+                    case "3":
+                        AddPatient();
+                        break;
+                    case "4":
+                        ShowPatients();
+                        break;
+                    case "5":
+                        BookAppointment();
+                        break;
+                    case "6":
+                        ShowAppointments();
+                        break;
+                    case "7":
+                        CompleteAppointment();
+                        break;
+                    case "8":
+                        AddMedicalRecord();
+                        break;
+                    case "9":
+                        ShowPatientHistory();
+                        break;
+                    case "10":
+                        ShowPatientCost();
+                        break;
+                    case "11":
+                        SortDoctors();
+                        break;
+                    case "0":
+                        isRunning = false;
+                        Console.WriteLine("Роботу меню завершено.");
+                        break;
+                    default:
+                        Console.WriteLine("Такого пункту немає.");
+                        break;
+                }
+            }
+            catch (DoctorScheduleConflictException ex)
+            {
+                Console.WriteLine("Помилка розкладу: " + ex.Message);
+            }
+            catch (InvalidPatientDataException ex)
+            {
+                Console.WriteLine("Помилка даних пацієнта: " + ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine("Помилка введення: " + ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine("Операцію неможливо виконати: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Сталася помилка: " + ex.Message);
+            }
+        }
+    }
+
+    private void AddDoctor()
+    {
+        int id = ReadInt("ID лікаря: ");
+        string name = ReadText("ПІБ лікаря: ");
+        string specialization = ReadText("Спеціалізація: ");
+        decimal price = ReadDecimal("Ціна консультації (грн): ");
+        int experienceMonths = ReadExperienceMonths();
+
+        Doctor doctor = new Doctor(
+            id,
+            name,
+            specialization,
+            price,
+            experienceMonths
+        );
+
+        _clinicService.AddDoctor(doctor);
+
+        Console.WriteLine("Лікаря успішно додано.");
+    }
+
+    private void ShowDoctors()
+    {
+        List<Doctor> doctors = _clinicService.GetDoctors();
+
+        if (doctors.Count == 0)
+        {
+            Console.WriteLine("Список лікарів порожній.");
+            return;
+        }
+
+        foreach (Doctor doctor in doctors)
+        {
+            int years = doctor.ExperienceMonths / 12;
+            int months = doctor.ExperienceMonths % 12;
+
+            Console.WriteLine(
+                $"ID: {doctor.Id}, ПІБ: {doctor.FullName}, " +
+                $"спеціалізація: {doctor.Specialization}, " +
+                $"ціна: {doctor.ConsultationPrice} грн, " +
+                $"стаж: {years} р. {months} міс."
+            );
+        }
+    }
+
+    private void AddPatient()
+    {
+        int id = ReadInt("ID пацієнта: ");
+        string name = ReadText("ПІБ пацієнта: ");
+        string phone = ReadText("Номер телефону: ");
+        DateTime birthDate = ReadDate(
+            "Дата народження (дд.мм.рррр): "
+        );
+
+        Patient patient = new Patient(
+            id,
+            name,
+            phone,
+            birthDate
+        );
+
+        _clinicService.AddPatient(patient);
+
+        Console.WriteLine("Пацієнта успішно додано.");
+    }
+
+    private void ShowPatients()
+    {
+        List<Patient> patients = _clinicService.GetPatients();
+
+        if (patients.Count == 0)
+        {
+            Console.WriteLine("Список пацієнтів порожній.");
+            return;
+        }
+
+        foreach (Patient patient in patients)
+        {
+            Console.WriteLine(
+                $"ID: {patient.Id}, ПІБ: {patient.FullName}, " +
+                $"телефон: {patient.PhoneNumber}, " +
+                $"дата народження: {patient.DateOfBirth:dd.MM.yyyy}"
+            );
+        }
+    }
+
+    private void BookAppointment()
+    {
+        List<Doctor> doctors = _clinicService.GetDoctors();
+        List<Patient> patients = _clinicService.GetPatients();
+
+        if (doctors.Count == 0 || patients.Count == 0)
+        {
+            Console.WriteLine(
+                "Спочатку додайте хоча б одного лікаря та пацієнта."
+            );
+            return;
+        }
+
+        ShowDoctors();
+        int doctorId = ReadInt("Введіть ID лікаря: ");
+        Doctor? doctor = null;
+
+        foreach (Doctor item in doctors)
+        {
+            if (item.Id == doctorId)
+            {
+                doctor = item;
+                break;
+            }
+        }
+
+        if (doctor == null)
+        {
+            Console.WriteLine("Лікаря не знайдено.");
+            return;
+        }
+
+        ShowPatients();
+        int patientId = ReadInt("Введіть ID пацієнта: ");
+        Patient? patient = null;
+
+        foreach (Patient item in patients)
+        {
+            if (item.Id == patientId)
+            {
+                patient = item;
+                break;
+            }
+        }
+
+        if (patient == null)
+        {
+            Console.WriteLine("Пацієнта не знайдено.");
+            return;
+        }
+
+        int appointmentId = ReadInt("ID прийому: ");
+        DateTime appointmentDate = ReadDate(
+            "Дата й час прийому (дд.мм.рррр гг:хх): "
+        );
+
+        Appointment appointment = _clinicService.BookAppointment(
+            appointmentId,
+            patient,
+            doctor,
+            appointmentDate
+        );
+
+        Console.WriteLine(
+            $"Прийом №{appointment.Id} успішно створено."
+        );
+    }
+
+    private void ShowAppointments()
+    {
+        List<Appointment> appointments =
+            _clinicService.GetAppointments();
+
+        if (appointments.Count == 0)
+        {
+            Console.WriteLine("Прийомів поки немає.");
+            return;
+        }
+
+        foreach (Appointment appointment in appointments)
+        {
+            Console.WriteLine(
+                $"ID: {appointment.Id}, " +
+                $"пацієнт: {appointment.Patient.FullName}, " +
+                $"лікар: {appointment.Doctor.FullName}, " +
+                $"дата: {appointment.AppointmentDate:dd.MM.yyyy HH:mm}, " +
+                $"вартість: {appointment.ServiceCost} грн, " +
+                $"статус: {appointment.Status}"
+            );
+        }
+    }
+
+    private void CompleteAppointment()
+    {
+        ShowAppointments();
+
+        int id = ReadInt("ID прийому для завершення: ");
+
+        _clinicService.CompleteAppointment(id);
+
+        Console.WriteLine("Прийом успішно завершено.");
+    }
+
+    private void AddMedicalRecord()
+    {
+        List<Patient> patients = _clinicService.GetPatients();
+        List<Appointment> appointments =
+            _clinicService.GetAppointments();
+
+        if (patients.Count == 0 || appointments.Count == 0)
+        {
+            Console.WriteLine(
+                "Для створення запису потрібні пацієнт і прийом."
+            );
+            return;
+        }
+
+        ShowPatients();
+        int patientId = ReadInt("ID пацієнта: ");
+        Patient? patient = null;
+
+        foreach (Patient item in patients)
+        {
+            if (item.Id == patientId)
+            {
+                patient = item;
+                break;
+            }
+        }
+
+        if (patient == null)
+        {
+            Console.WriteLine("Пацієнта не знайдено.");
+            return;
+        }
+
+        ShowAppointments();
+        int appointmentId = ReadInt("ID прийому: ");
+        Appointment? appointment = null;
+
+        foreach (Appointment item in appointments)
+        {
+            if (item.Id == appointmentId)
+            {
+                appointment = item;
+                break;
+            }
+        }
+
+        if (appointment == null)
+        {
+            Console.WriteLine("Прийом не знайдено.");
+            return;
+        }
+
+        int recordId = ReadInt("ID медичного запису: ");
+        string diagnosis = ReadText("Діагноз: ");
+        string treatment = ReadText("Призначення: ");
+        DateTime recordDate = ReadDate(
+            "Дата запису (дд.мм.рррр): "
+        );
+
+        MedicalRecord record = new MedicalRecord(
+            recordId,
+            patient,
+            appointment,
+            diagnosis,
+            treatment,
+            recordDate
+        );
+
+        _clinicService.AddMedicalRecord(record);
+
+        Console.WriteLine("Медичний запис успішно додано.");
+    }
+
+    private void ShowPatientHistory()
+    {
+        int patientId = ReadInt("ID пацієнта: ");
+
+        List<MedicalRecord> records =
+            _clinicService.GetPatientHistory(patientId);
+
+        if (records.Count == 0)
+        {
+            Console.WriteLine("Медичних записів не знайдено.");
+            return;
+        }
+
+        foreach (MedicalRecord record in records)
+        {
+            Console.WriteLine(
+                $"Дата: {record.RecordDate:dd.MM.yyyy}, " +
+                $"діагноз: {record.Diagnosis}, " +
+                $"призначення: {record.Treatment}"
+            );
+        }
+    }
+
+    private void ShowPatientCost()
+    {
+        int patientId = ReadInt("ID пацієнта: ");
+
+        decimal total = _clinicService.CalculateTotalCost(patientId);
+
+        Console.WriteLine(
+            $"Загальна вартість завершених прийомів: {total} грн"
+        );
+    }
+
+    private void SortDoctors()
+    {
+        List<Doctor> doctors = _clinicService.GetDoctors();
+
+        doctors.Sort(new DoctorPriceComparer());
+
+        if (doctors.Count == 0)
+        {
+            Console.WriteLine("Список лікарів порожній.");
+            return;
+        }
+
+        foreach (Doctor doctor in doctors)
+        {
+            Console.WriteLine(
+                $"{doctor.FullName} — {doctor.ConsultationPrice} грн"
+            );
+        }
+    }
+
+    private int ReadInt(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            string input = Console.ReadLine() ?? "";
+
+            if (int.TryParse(input, out int result) && result > 0)
+            {
+                return result;
+            }
+
+            Console.WriteLine("Введіть ціле додатне число.");
+        }
+    }
+
+    private decimal ReadDecimal(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            string input = Console.ReadLine() ?? "";
+
+            input = input.Replace(
+                "грн",
+                "",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            input = input.Replace(" ", "");
+            input = input.Replace(',', '.');
+
+            if (decimal.TryParse(
+                input,
+                NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture,
+                out decimal result) && result >= 0)
+            {
+                return result;
+            }
+
+            Console.WriteLine(
+                "Введіть коректну невід'ємну суму, наприклад 2000 грн."
+            );
+        }
+    }
+
+    private int ReadExperienceMonths()
+    {
+        while (true)
+        {
+            Console.Write(
+                "Стаж лікаря (наприклад, 5 років або 2 роки 6 місяців): "
+            );
+
+            string input = Console.ReadLine() ?? "";
+            input = input.ToLower().Trim();
+
+            string[] parts = input.Split(
+                ' ',
+                StringSplitOptions.RemoveEmptyEntries
+            );
+
+            int years = 0;
+            int months = 0;
+            bool valid = parts.Length > 0;
+
+            for (int i = 0; i < parts.Length && valid; i++)
+            {
+                if (!int.TryParse(parts[i], out int number) || number < 0)
+                {
+                    valid = false;
+                    break;
+                }
+
+                if (i + 1 >= parts.Length)
+                {
+                    valid = false;
+                    break;
+                }
+
+                string unit = parts[i + 1];
+
+                if (unit.StartsWith("рок") || unit == "рік")
+                {
+                    years = number;
+                    i++;
+                }
+                else if (
+                    unit.StartsWith("місяц") ||
+                    unit.StartsWith("міс")
+                )
+                {
+                    months = number;
+                    i++;
+                }
+                else
+                {
+                    valid = false;
+                }
+            }
+
+            if (valid && (years > 0 || months > 0 ||
+                input == "0 років" || input == "0 місяців"))
+            {
+                years += months / 12;
+                months %= 12;
+
+                return years * 12 + months;
+            }
+
+            Console.WriteLine(
+                "Введіть стаж, наприклад: 5 років або 2 роки 6 місяців."
+            );
+        }
+    }
+
+    private string ReadText(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            string input = Console.ReadLine() ?? "";
+
+            if (!string.IsNullOrWhiteSpace(input))
+            {
+                return input.Trim();
+            }
+
+            Console.WriteLine("Поле не може бути порожнім.");
+        }
+    }
+
+    private DateTime ReadDate(string prompt)
+    {
+        while (true)
+        {
+            Console.Write(prompt);
+            string input = Console.ReadLine() ?? "";
+
+            if (DateTime.TryParse(input, out DateTime result))
+            {
+                return result;
+            }
+
+            Console.WriteLine(
+                "Введіть коректну дату. Наприклад: 20.10.2026"
+            );
+        }
+    }
+}

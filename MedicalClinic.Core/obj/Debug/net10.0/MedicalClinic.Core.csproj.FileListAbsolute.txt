@@ -1,0 +1,12 @@
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/bin/Debug/net10.0/MedicalClinic.Core.deps.json
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/bin/Debug/net10.0/MedicalClinic.Core.dll
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/bin/Debug/net10.0/MedicalClinic.Core.pdb
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/MedicalClinic.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/MedicalClinic.Core.AssemblyInfoInputs.cache
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/MedicalClinic.Core.AssemblyInfo.cs
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/MedicalClinic.Core.csproj.CoreCompileInputs.cache
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/MedicalClinic.Core.sourcelink.json
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/MedicalClinic.Core.dll
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/refint/MedicalClinic.Core.dll
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/MedicalClinic.Core.pdb
+/Users/elizavetarevun/Documents/MedicalClinic/MedicalClinic.Core/obj/Debug/net10.0/ref/MedicalClinic.Core.dll

@@ -1,0 +1,81 @@
+
+namespace MedicalClinic.Core.Models;
+
+public class Doctor : Entity
+{
+    private string _fullName = "";
+    private string _specialization = "";
+    private decimal _consultationPrice;
+
+    public string FullName
+    {
+        get { return _fullName; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(
+                    "Ім'я лікаря не може бути порожнім."
+                );
+            }
+
+            _fullName = value;
+        }
+    }
+
+    public string Specialization
+    {
+        get { return _specialization; }
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(
+                    "Спеціалізація не може бути порожньою."
+                );
+            }
+
+            _specialization = value;
+        }
+    }
+
+    public decimal ConsultationPrice
+    {
+        get { return _consultationPrice; }
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException(
+                    "Вартість консультації не може бути від'ємною."
+                );
+            }
+
+            _consultationPrice = value;
+        }
+    }
+
+    public int ExperienceMonths { get; private set; }
+
+    public Doctor(
+        int id,
+        string fullName,
+        string specialization,
+        decimal consultationPrice,
+        int experienceMonths = 0
+    ) : base(id)
+    {
+        FullName = fullName;
+        Specialization = specialization;
+        ConsultationPrice = consultationPrice;
+
+        if (experienceMonths < 0)
+        {
+            throw new ArgumentException(
+                "Стаж не може бути від'ємним."
+            );
+        }
+
+        ExperienceMonths = experienceMonths;
+    }
+}

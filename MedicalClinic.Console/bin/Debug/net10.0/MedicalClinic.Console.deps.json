@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "MedicalClinic.Console/1.0.0": {
+        "dependencies": {
+          "MedicalClinic.Core": "1.0.0"
+        },
+        "runtime": {
+          "MedicalClinic.Console.dll": {}
+        }
+      },
+      "MedicalClinic.Core/1.0.0": {
+        "runtime": {
+          "MedicalClinic.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MedicalClinic.Console/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "MedicalClinic.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

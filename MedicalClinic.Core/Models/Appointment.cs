@@ -1,0 +1,65 @@
+namespace MedicalClinic.Core.Models;
+
+public enum AppointmentStatus
+{
+    Scheduled,
+    Completed,
+    Cancelled
+}
+
+public class Appointment : Entity
+{
+    public Patient Patient { get; private set; }
+    public Doctor Doctor { get; private set; }
+    public DateTime AppointmentDate { get; private set; }
+    public decimal ServiceCost { get; private set; }
+    public int DurationMinutes { get; private set; }
+
+    public DateTime EndDateTime => AppointmentDate.AddMinutes(DurationMinutes);
+
+    public AppointmentStatus Status { get; set; }
+
+    public Appointment(
+        int id,
+        Patient patient,
+        Doctor doctor,
+        DateTime appointmentDate,
+        decimal serviceCost,
+        int durationMinutes = 60
+    ) : base(id)
+    {
+        if (patient == null)
+        {
+            throw new ArgumentException("Вкажіть пацієнта.");
+        }
+
+        if (doctor == null)
+        {
+            throw new ArgumentException("Вкажіть лікаря.");
+        }
+
+        if (appointmentDate == DateTime.MinValue)
+        {
+            throw new ArgumentException("Вкажіть дату прийому.");
+        }
+
+        if (serviceCost < 0)
+        {
+            throw new ArgumentException("Ціна не може бути від'ємною.");
+        }
+
+        if (durationMinutes <= 0 || durationMinutes > 480)
+        {
+            throw new ArgumentException(
+                "Тривалість прийому має бути від 1 до 480 хвилин (8 годин)."
+            );
+        }
+
+        Patient = patient;
+        Doctor = doctor;
+        AppointmentDate = appointmentDate;
+        ServiceCost = serviceCost;
+        DurationMinutes = durationMinutes;
+        Status = AppointmentStatus.Scheduled;
+    }
+}

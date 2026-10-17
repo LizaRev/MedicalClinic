@@ -1,0 +1,44 @@
+namespace MedicalClinic.Core.Models;
+
+public class MedicalRecord : Entity
+{
+    public Patient Patient { get; private set; }
+    public Appointment Appointment { get; private set; }
+    public string Diagnosis { get; private set; }
+    public string Treatment { get; private set; }
+    public DateTime RecordDate { get; private set; }
+
+    public MedicalRecord(int id, Patient patient, Appointment appointment, string diagnosis, string treatment, DateTime recordDate) : base(id)
+    {
+        if (patient == null || appointment == null)
+        {
+            throw new ArgumentException("Вкажіть пацієнта та прийом.");
+        }
+
+        if (appointment.Patient.Id != patient.Id)
+        {
+            throw new ArgumentException("Прийом належить іншому пацієнту.");
+        }
+
+        if (string.IsNullOrWhiteSpace(diagnosis))
+        {
+            throw new ArgumentException("Вкажіть діагноз.");
+        }
+
+        if (string.IsNullOrWhiteSpace(treatment))
+        {
+            throw new ArgumentException("Вкажіть призначення.");
+        }
+
+        if (recordDate == DateTime.MinValue)
+        {
+            throw new ArgumentException("Вкажіть дату запису.");
+        }
+
+        Patient = patient;
+        Appointment = appointment;
+        Diagnosis = diagnosis;
+        Treatment = treatment;
+        RecordDate = recordDate;
+    }
+}

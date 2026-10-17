@@ -1,0 +1,96 @@
+﻿using System.Text.Json;
+using MedicalClinic.Core.Models;
+using MedicalClinic.Core.Services;
+
+namespace MedicalClinic.ConsoleApp;
+
+internal class Program
+{
+    private static void Main()
+    {
+        string dataDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+
+        DoctorJsonFileService doctorFile = new DoctorJsonFileService(
+            Path.Combine(dataDirectory, "doctors.json")
+        );
+
+        PatientJsonFileService patientFile = new PatientJsonFileService(
+            Path.Combine(dataDirectory, "patients.json")
+        );
+
+        JsonFileService<Appointment> appointmentFile = new JsonFileService<Appointment>(
+            Path.Combine(dataDirectory, "appointments.json")
+        );
+
+        JsonFileService<MedicalRecord> medicalRecordFile = new JsonFileService<MedicalRecord>(
+            Path.Combine(dataDirectory, "medicalRecords.json")
+        );
+
+        List<Doctor> doctors;
+        List<Patient> patients;
+        List<Appointment> appointments;
+        List<MedicalRecord> medicalRecords;
+
+        try
+        {
+            doctors = doctorFile.Load();
+            patients = patientFile.Load();
+            appointments = appointmentFile.Load();
+            medicalRecords = medicalRecordFile.Load();
+        }
+        catch (JsonException)
+        {
+            Console.WriteLine("Помилка читання JSON. Перевірте формат файлів у папці Data.");
+            return;
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine("Помилка читання файлів: " + ex.Message);
+            return;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            Console.WriteLine("Немає дозволу на читання файлів.");
+            return;
+        }
+
+        ClinicService clinicService = new ClinicService();
+
+        try
+        {
+            clinicService.LoadDoctors(doctors);
+            clinicService.LoadPatients(patients);
+            clinicService.LoadAppointments(appointments);
+            clinicService.LoadMedicalRecords(medicalRecords);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Не вдалося завантажити дані клініки: " + ex.Message);
+            return;
+        }
+
+        Console.WriteLine("Дані клініки завантажено.");
+        Console.WriteLine($"Лікарів: {doctors.Count}");
+        Console.WriteLine($"Пацієнтів: {patients.Count}");
+        Console.WriteLine($"Прийомів: {appointments.Count}");
+        Console.WriteLine($"Медичних записів: {medicalRecords.Count}");
+
+        ClinicMenu menu = new ClinicMenu(clinicService);
+
+        menu.Run();
+
+        try
+        {
+            doctorFile.Save(clinicService.GetDoctors());
+            patientFile.Save(clinicService.GetPatients());
+            appointmentFile.Save(clinicService.GetAppointments());
+            medicalRecordFile.Save(clinicService.GetMedicalRecords());
+
+            Console.WriteLine("Усі дані успішно збережено.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Не вдалося зберегти дані: " + ex.Message);
+        }
+    }
+}

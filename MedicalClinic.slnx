@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MedicalClinic.Console/MedicalClinic.Console.csproj" />
+  <Project Path="MedicalClinic.Core/MedicalClinic.Core.csproj" />
+</Solution>
