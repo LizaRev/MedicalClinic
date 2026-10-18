@@ -11,7 +11,7 @@ public class PatientJson
     public string FullName { get; set; } = "";
 
     [JsonPropertyName("Номер телефону")]
-    public string PhoneNumber { get; set; } = "";
+    public string PhoneNumber { get; set; } = ""; 
 
     [JsonPropertyName("Дата народження")]
     public string DateOfBirth { get; set; } = "";

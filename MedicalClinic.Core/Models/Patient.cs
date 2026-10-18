@@ -18,16 +18,12 @@ public class Patient : Entity
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new InvalidPatientDataException(
-                    "ПІБ пацієнта не може бути порожнім."
-                );
+                throw new InvalidPatientDataException("ПІБ пацієнта не може бути порожнім.");
             }
 
             string name = value.Trim();
 
-            if (!Regex.IsMatch(
-                name,
-                ValidationPatterns.FullName))
+            if (!Regex.IsMatch(name, ValidationPatterns.FullName))
             {
                 throw new InvalidPatientDataException(
                     "ПІБ має містити лише літери, пробіли, дефіс або апостроф."
@@ -44,9 +40,7 @@ public class Patient : Entity
         set
         {
             if (string.IsNullOrWhiteSpace(value) ||
-                !Regex.IsMatch(
-                    value.Trim(),
-                    ValidationPatterns.PhoneNumber))
+                !Regex.IsMatch(value.Trim(), ValidationPatterns.PhoneNumber))
             {
                 throw new InvalidPatientDataException(
                     "Номер телефону має містити рівно 10 цифр, наприклад 0956476578."
@@ -64,21 +58,14 @@ public class Patient : Entity
         {
             if (value.Date >= DateTime.Today)
             {
-                throw new ArgumentException(
-                    "Дата народження має бути в минулому."
-                );
+                throw new ArgumentException("Дата народження має бути в минулому.");
             }
 
             _dateOfBirth = value;
         }
     }
 
-    public Patient(
-        int id,
-        string fullName,
-        string phoneNumber,
-        DateTime dateOfBirth
-    ) : base(id)
+    public Patient(int id, string fullName, string phoneNumber, DateTime dateOfBirth) : base(id)
     {
         FullName = fullName;
         PhoneNumber = phoneNumber;

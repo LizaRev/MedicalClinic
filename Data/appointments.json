@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "Patient": {
+      "FullName": "Тимощук Анна Андріївна",
+      "PhoneNumber": "0957895678",
+      "DateOfBirth": "2000-10-14T00:00:00",
+      "Id": 23
+    },
+    "Doctor": {
+      "FullName": "Коваленко Марія Олександрівна",
+      "Specialization": "Хірург",
+      "ConsultationPrice": 1300,
+      "ExperienceMonths": 84,
+      "Id": 13
+    },
+    "AppointmentDate": "2026-11-18T15:00:00",
+    "ServiceCost": 1300,
+    "DurationMinutes": 50,
+    "EndDateTime": "2026-11-18T15:50:00",
+    "Status": 1,
+    "Id": 1
+  }
+]

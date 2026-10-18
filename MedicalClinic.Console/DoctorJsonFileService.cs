@@ -34,8 +34,7 @@ public class DoctorJsonFileService
 
         JsonSerializerOptions options = new JsonSerializerOptions();
 
-        if (document.RootElement[0].TryGetProperty(
-            "ПІБ лікаря", out _))
+        if (document.RootElement[0].TryGetProperty("ПІБ лікаря", out _))
         {
             List<DoctorJson> savedDoctors =
                 JsonSerializer.Deserialize<List<DoctorJson>>(json, options)

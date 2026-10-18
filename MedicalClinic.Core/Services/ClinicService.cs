@@ -31,9 +31,7 @@ public class ClinicService : IClinicService
         {
             if (existing.Id == doctor.Id)
             {
-                throw new ArgumentException(
-                    "Лікар із таким ID вже існує."
-                );
+                throw new ArgumentException("Лікар із таким ID вже існує.");
             }
         }
 
@@ -44,18 +42,14 @@ public class ClinicService : IClinicService
     {
         if (patient == null)
         {
-            throw new InvalidPatientDataException(
-                "Дані пацієнта не можуть бути порожніми."
-            );
+            throw new InvalidPatientDataException("Дані пацієнта не можуть бути порожніми.");
         }
 
         foreach (Patient existing in _patients.GetAll())
         {
             if (existing.Id == patient.Id)
             {
-                throw new InvalidPatientDataException(
-                    "Пацієнт із таким ID вже існує."
-                );
+                throw new InvalidPatientDataException("Пацієнт із таким ID вже існує.");
             }
         }
 
@@ -82,63 +76,44 @@ public class ClinicService : IClinicService
         return _medicalRecords.GetAll();
     }
 
-    public Appointment BookAppointment(
-        int id,
-        Patient patient,
-        Doctor doctor,
-        DateTime appointmentDate,
-        int durationMinutes = 60)
+    public Appointment BookAppointment(int id, Patient patient, Doctor doctor, DateTime appointmentDate, int durationMinutes = 60)
     {
         if (id <= 0)
         {
-            throw new ArgumentException(
-                "ID прийому має бути додатним числом."
-            );
+            throw new ArgumentException("ID прийому має бути додатним числом.");
         }
 
         foreach (Appointment existing in _appointments.GetAll())
         {
             if (existing.Id == id)
             {
-                throw new ArgumentException(
-                    "Прийом із таким ID вже існує."
-                );
+                throw new ArgumentException("Прийом із таким ID вже існує.");
             }
         }
 
         if (patient == null)
         {
-            throw new InvalidPatientDataException(
-                "Необхідно вибрати пацієнта."
-            );
+            throw new InvalidPatientDataException("Необхідно вибрати пацієнта.");
         }
 
         if (!_patients.GetAll().Contains(patient))
         {
-            throw new InvalidPatientDataException(
-                "Пацієнт не зареєстрований у клініці."
-            );
+            throw new InvalidPatientDataException("Пацієнт не зареєстрований у клініці.");
         }
 
         if (doctor == null || !_doctors.GetAll().Contains(doctor))
         {
-            throw new ArgumentException(
-                "Лікар не зареєстрований у клініці."
-            );
+            throw new ArgumentException("Лікар не зареєстрований у клініці.");
         }
 
         if (appointmentDate <= DateTime.Now)
         {
-            throw new ArgumentException(
-                "Дата прийому має бути в майбутньому."
-            );
+            throw new ArgumentException("Дата прийому має бути в майбутньому.");
         }
 
         if (durationMinutes <= 0)
         {
-            throw new ArgumentException(
-                "Тривалість прийому має бути більшою за нуль."
-            );
+            throw new ArgumentException("Тривалість прийому має бути більшою за нуль.");
         }
 
         DateTime newEndDate = appointmentDate.AddMinutes(durationMinutes);
@@ -151,8 +126,7 @@ public class ClinicService : IClinicService
                 DateTime existingStart = existing.AppointmentDate;
                 DateTime existingEnd = existing.EndDateTime;
 
-                if (appointmentDate < existingEnd &&
-                    newEndDate > existingStart)
+                if (appointmentDate < existingEnd && newEndDate > existingStart)
                 {
                     throw new DoctorScheduleConflictException(
                         "Лікар уже зайнятий у цей проміжок часу. " +
@@ -182,18 +156,14 @@ public class ClinicService : IClinicService
     {
         if (record == null)
         {
-            throw new ArgumentException(
-                "Медична картка не може бути порожньою."
-            );
+            throw new ArgumentException("Медична картка не може бути порожньою.");
         }
 
         foreach (MedicalRecord existing in _medicalRecords.GetAll())
         {
             if (existing.Id == record.Id)
             {
-                throw new ArgumentException(
-                    "Медичний запис із таким ID вже існує."
-                );
+                throw new ArgumentException("Медичний запис із таким ID вже існує.");
             }
         }
 
@@ -204,23 +174,17 @@ public class ClinicService : IClinicService
     {
         if (patientId <= 0)
         {
-            throw new ArgumentException(
-                "ID пацієнта має бути додатним числом."
-            );
+            throw new ArgumentException("ID пацієнта має бути додатним числом.");
         }
 
-        return _medicalRecords.Find(
-            record => record.Patient.Id == patientId
-        );
+        return _medicalRecords.Find(record => record.Patient.Id == patientId);
     }
 
     public decimal CalculateTotalCost(int patientId)
     {
         if (patientId <= 0)
         {
-            throw new ArgumentException(
-                "ID пацієнта має бути додатним числом."
-            );
+            throw new ArgumentException("ID пацієнта має бути додатним числом.");
         }
 
         decimal total = 0;
@@ -241,9 +205,7 @@ public class ClinicService : IClinicService
     {
         if (appointmentId <= 0)
         {
-            throw new ArgumentException(
-                "ID прийому має бути додатним числом."
-            );
+            throw new ArgumentException("ID прийому має бути додатним числом.");
         }
 
         foreach (Appointment appointment in _appointments.GetAll())
@@ -252,16 +214,12 @@ public class ClinicService : IClinicService
             {
                 if (appointment.Status == AppointmentStatus.Completed)
                 {
-                    throw new InvalidOperationException(
-                        "Цей прийом уже завершений."
-                    );
+                    throw new InvalidOperationException("Цей прийом уже завершений.");
                 }
 
                 if (appointment.Status == AppointmentStatus.Cancelled)
                 {
-                    throw new InvalidOperationException(
-                        "Скасований прийом не можна завершити."
-                    );
+                    throw new InvalidOperationException("Скасований прийом не можна завершити.");
                 }
 
                 appointment.Status = AppointmentStatus.Completed;

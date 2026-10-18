@@ -10,7 +10,7 @@ public class DoctorJson
     [JsonPropertyName("ПІБ лікаря")]
     public string FullName { get; set; } = "";
 
-    [JsonPropertyName("Спеціалізація")]
+    [JsonPropertyName("Спеціалізація")] 
     public string Specialization { get; set; } = "";
 
     [JsonPropertyName("Ціна консультації")]

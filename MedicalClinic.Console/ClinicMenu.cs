@@ -161,16 +161,9 @@ public class ClinicMenu
         int id = ReadInt("ID пацієнта: ");
         string name = ReadText("ПІБ пацієнта: ");
         string phone = ReadText("Номер телефону: ");
-        DateTime birthDate = ReadDate(
-            "Дата народження (дд.мм.рррр): "
-        );
+        DateTime birthDate = ReadDate("Дата народження (дд.мм.рррр): ");
 
-        Patient patient = new Patient(
-            id,
-            name,
-            phone,
-            birthDate
-        );
+        Patient patient = new Patient(id, name, phone, birthDate);
 
         _clinicService.AddPatient(patient);
         _saveData();
@@ -254,14 +247,10 @@ public class ClinicMenu
         }
 
         int appointmentId = ReadInt("ID нового прийому: ");
-
         DateTime appointmentDate = ReadDate(
             "Дата й час прийому (дд.мм.рррр гг:хх): "
         );
-
-        int durationMinutes = ReadInt(
-            "Тривалість прийому в хвилинах: "
-        );
+        int durationMinutes = ReadInt("Тривалість прийому в хвилинах: ");
 
         Appointment appointment = _clinicService.BookAppointment(
             appointmentId,
@@ -282,15 +271,12 @@ public class ClinicMenu
         Console.WriteLine(
             $"Завершення: {appointment.EndDateTime:dd.MM.yyyy HH:mm}"
         );
-        Console.WriteLine(
-            $"Тривалість: {appointment.DurationMinutes} хв."
-        );
+        Console.WriteLine($"Тривалість: {appointment.DurationMinutes} хв.");
     }
 
     private void ShowAppointments()
     {
-        List<Appointment> appointments =
-            _clinicService.GetAppointments();
+        List<Appointment> appointments = _clinicService.GetAppointments();
 
         if (appointments.Count == 0)
         {
@@ -328,8 +314,7 @@ public class ClinicMenu
     private void AddMedicalRecord()
     {
         List<Patient> patients = _clinicService.GetPatients();
-        List<Appointment> appointments =
-            _clinicService.GetAppointments();
+        List<Appointment> appointments = _clinicService.GetAppointments();
 
         if (patients.Count == 0 || appointments.Count == 0)
         {
@@ -382,10 +367,7 @@ public class ClinicMenu
         int recordId = ReadInt("ID медичного запису: ");
         string diagnosis = ReadText("Діагноз: ");
         string treatment = ReadText("Призначення: ");
-
-        DateTime recordDate = ReadDate(
-            "Дата запису (дд.мм.рррр): "
-        );
+        DateTime recordDate = ReadDate("Дата запису (дд.мм.рррр): ");
 
         MedicalRecord record = new MedicalRecord(
             recordId,
@@ -414,9 +396,7 @@ public class ClinicMenu
         ShowPatients();
 
         int patientId = ReadInt("ID пацієнта: ");
-
-        List<MedicalRecord> records =
-            _clinicService.GetPatientHistory(patientId);
+        List<MedicalRecord> records = _clinicService.GetPatientHistory(patientId);
 
         if (records.Count == 0)
         {
@@ -446,7 +426,6 @@ public class ClinicMenu
         ShowPatients();
 
         int patientId = ReadInt("ID пацієнта: ");
-
         decimal total = _clinicService.CalculateTotalCost(patientId);
 
         Console.WriteLine(
@@ -497,12 +476,7 @@ public class ClinicMenu
             Console.Write(prompt);
             string input = Console.ReadLine() ?? "";
 
-            input = input.Replace(
-                "грн",
-                "",
-                StringComparison.OrdinalIgnoreCase
-            );
-
+            input = input.Replace("грн", "", StringComparison.OrdinalIgnoreCase);
             input = input.Replace(" ", "");
             input = input.Replace(',', '.');
 
@@ -530,7 +504,6 @@ public class ClinicMenu
             );
 
             string input = (Console.ReadLine() ?? "").ToLower().Trim();
-
             string[] parts = input.Split(
                 ' ',
                 StringSplitOptions.RemoveEmptyEntries
@@ -561,9 +534,7 @@ public class ClinicMenu
                     years = number;
                     i++;
                 }
-                else if (
-                    unit.StartsWith("місяц") ||
-                    unit.StartsWith("міс"))
+                else if (unit.StartsWith("місяц") || unit.StartsWith("міс"))
                 {
                     months = number;
                     i++;
@@ -638,8 +609,7 @@ public class ClinicMenu
 
             if (isValid)
             {
-                if (prompt.Contains("народження") &&
-                    result.Date > DateTime.Today)
+                if (prompt.Contains("народження") && result.Date > DateTime.Today)
                 {
                     Console.WriteLine(
                         "Дата народження не може бути в майбутньому."

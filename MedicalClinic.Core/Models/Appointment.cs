@@ -14,19 +14,10 @@ public class Appointment : Entity
     public DateTime AppointmentDate { get; private set; }
     public decimal ServiceCost { get; private set; }
     public int DurationMinutes { get; private set; }
-
     public DateTime EndDateTime => AppointmentDate.AddMinutes(DurationMinutes);
-
     public AppointmentStatus Status { get; set; }
 
-    public Appointment(
-        int id,
-        Patient patient,
-        Doctor doctor,
-        DateTime appointmentDate,
-        decimal serviceCost,
-        int durationMinutes = 60
-    ) : base(id)
+    public Appointment(int id, Patient patient, Doctor doctor, DateTime appointmentDate, decimal serviceCost, int durationMinutes = 60) : base(id)
     {
         if (patient == null)
         {

@@ -72,7 +72,13 @@ public class Doctor : Entity, IComparable<Doctor>
 
     public int ExperienceMonths { get; private set; }
 
-    public Doctor(int id, string fullName, string specialization, decimal consultationPrice, int experienceMonths = 0) : base(id)
+    public Doctor(
+        int id,
+        string fullName,
+        string specialization,
+        decimal consultationPrice,
+        int experienceMonths = 0
+    ) : base(id)
     {
         FullName = fullName;
         Specialization = specialization;

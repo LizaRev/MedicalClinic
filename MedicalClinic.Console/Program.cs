@@ -105,4 +105,4 @@ internal class Program
             Console.WriteLine("Не вдалося зберегти дані: " + ex.Message);
         }
     }
-}
+} 
