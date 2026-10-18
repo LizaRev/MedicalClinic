@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using MedicalClinic.Core.Exceptions;
 using MedicalClinic.Core.Models;
@@ -8,10 +9,12 @@ namespace MedicalClinic.ConsoleApp;
 public class ClinicMenu
 {
     private readonly ClinicService _clinicService;
+    private readonly Action _saveData;
 
-    public ClinicMenu(ClinicService clinicService)
+    public ClinicMenu(ClinicService clinicService, Action saveData)
     {
         _clinicService = clinicService;
+        _saveData = saveData;
     }
 
     public void Run()
@@ -124,6 +127,7 @@ public class ClinicMenu
         );
 
         _clinicService.AddDoctor(doctor);
+        _saveData();
 
         Console.WriteLine("Лікаря успішно додано.");
     }
@@ -169,6 +173,7 @@ public class ClinicMenu
         );
 
         _clinicService.AddPatient(patient);
+        _saveData();
 
         Console.WriteLine("Пацієнта успішно додано.");
     }
@@ -208,8 +213,8 @@ public class ClinicMenu
 
         Console.WriteLine("Список пацієнтів:");
         ShowPatients();
-        int patientId = ReadInt("Введіть ID пацієнта: ");
 
+        int patientId = ReadInt("Введіть ID пацієнта: ");
         Patient? patient = null;
 
         foreach (Patient item in patients)
@@ -229,8 +234,8 @@ public class ClinicMenu
 
         Console.WriteLine("Список лікарів:");
         ShowDoctors();
-        int doctorId = ReadInt("Введіть ID лікаря: ");
 
+        int doctorId = ReadInt("Введіть ID лікаря: ");
         Doctor? doctor = null;
 
         foreach (Doctor item in doctors)
@@ -265,6 +270,8 @@ public class ClinicMenu
             appointmentDate,
             durationMinutes
         );
+
+        _saveData();
 
         Console.WriteLine("Прийом успішно створено.");
         Console.WriteLine($"Пацієнт: {appointment.Patient.FullName}");
@@ -313,6 +320,7 @@ public class ClinicMenu
         int id = ReadInt("ID прийому для завершення: ");
 
         _clinicService.CompleteAppointment(id);
+        _saveData();
 
         Console.WriteLine("Прийом успішно завершено.");
     }
@@ -389,6 +397,7 @@ public class ClinicMenu
         );
 
         _clinicService.AddMedicalRecord(record);
+        _saveData();
 
         Console.WriteLine("Медичний запис успішно додано.");
     }

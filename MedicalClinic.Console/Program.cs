@@ -8,7 +8,9 @@ internal class Program
 {
     private static void Main()
     {
-        string dataDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Data");
+        string dataDirectory = Path.GetFullPath(
+            Path.Combine(AppContext.BaseDirectory, "../../../../Data")
+        );
 
         DoctorJsonFileService doctorFile = new DoctorJsonFileService(
             Path.Combine(dataDirectory, "doctors.json")
@@ -18,13 +20,15 @@ internal class Program
             Path.Combine(dataDirectory, "patients.json")
         );
 
-        JsonFileService<Appointment> appointmentFile = new JsonFileService<Appointment>(
-            Path.Combine(dataDirectory, "appointments.json")
-        );
+        JsonFileService<Appointment> appointmentFile =
+            new JsonFileService<Appointment>(
+                Path.Combine(dataDirectory, "appointments.json")
+            );
 
-        JsonFileService<MedicalRecord> medicalRecordFile = new JsonFileService<MedicalRecord>(
-            Path.Combine(dataDirectory, "medicalRecords.json")
-        );
+        JsonFileService<MedicalRecord> medicalRecordFile =
+            new JsonFileService<MedicalRecord>(
+                Path.Combine(dataDirectory, "medicalRecords.json")
+            );
 
         List<Doctor> doctors;
         List<Patient> patients;
@@ -38,9 +42,9 @@ internal class Program
             appointments = appointmentFile.Load();
             medicalRecords = medicalRecordFile.Load();
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
-            Console.WriteLine("Помилка читання JSON. Перевірте формат файлів у папці Data.");
+            Console.WriteLine("Помилка читання JSON: " + ex.Message);
             return;
         }
         catch (IOException ex)
@@ -65,8 +69,20 @@ internal class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Не вдалося завантажити дані клініки: " + ex.Message);
+            Console.WriteLine(
+                "Не вдалося завантажити дані клініки: " + ex.Message
+            );
             return;
+        }
+
+        void SaveData()
+        {
+            doctorFile.Save(clinicService.GetDoctors());
+            patientFile.Save(clinicService.GetPatients());
+            appointmentFile.Save(clinicService.GetAppointments());
+            medicalRecordFile.Save(clinicService.GetMedicalRecords());
+
+            Console.WriteLine("Дані успішно збережено.");
         }
 
         Console.WriteLine("Дані клініки завантажено.");
@@ -74,19 +90,15 @@ internal class Program
         Console.WriteLine($"Пацієнтів: {patients.Count}");
         Console.WriteLine($"Прийомів: {appointments.Count}");
         Console.WriteLine($"Медичних записів: {medicalRecords.Count}");
+        Console.WriteLine("Папка даних: " + dataDirectory);
 
-        ClinicMenu menu = new ClinicMenu(clinicService);
+        ClinicMenu menu = new ClinicMenu(clinicService, SaveData);
 
         menu.Run();
 
         try
         {
-            doctorFile.Save(clinicService.GetDoctors());
-            patientFile.Save(clinicService.GetPatients());
-            appointmentFile.Save(clinicService.GetAppointments());
-            medicalRecordFile.Save(clinicService.GetMedicalRecords());
-
-            Console.WriteLine("Усі дані успішно збережено.");
+            SaveData();
         }
         catch (Exception ex)
         {
